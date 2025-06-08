@@ -1,0 +1,81 @@
+{
+  "name": "sizewise",
+  "version": "1.0.0",
+  "description": "A platform-agnostic pull/merge request size analyzer that works with GitLab and GitHub",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "sizewise": "./dist/cli.js"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md",
+    "LICENSE",
+    "example.config.json"
+  ],
+  "scripts": {
+    "build": "tsc && chmod +x dist/cli.js",
+    "start": "node dist/cli.js",
+    "dev": "ts-node src/cli.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"**/*.{ts,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,js,json,md}\"",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean && npm run type-check",
+    "prepublishOnly": "npm run build",
+    "release": "npm run build && npm publish"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "gitlab",
+    "github",
+    "merge-request",
+    "pull-request",
+    "code-review",
+    "analysis",
+    "metrics",
+    "cli",
+    "ci",
+    "cd",
+    "platform-agnostic"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/sizewise.git"
+  },
+  "dependencies": {
+    "@gitbeaker/rest": "^42.5.0",
+    "@octokit/rest": "^20.0.0",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.8",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "audit-ci": "^7.1.0",
+    "eslint": "^8.56.0",
+    "globals": "^15.12.0",
+    "inquirer": "^8.2.6",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.3.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

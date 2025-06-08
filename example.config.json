@@ -1,0 +1,44 @@
+{
+  "thresholds": {
+    "small": {
+      "files": 5,
+      "lines": 50,
+      "directories": 2
+    },
+    "medium": {
+      "files": 10,
+      "lines": 200,
+      "directories": 4
+    },
+    "large": {
+      "files": 20,
+      "lines": 500,
+      "directories": 8
+    }
+  },
+  "excludePatterns": [
+    "**/*.lock",
+    "**/package-lock.json",
+    "**/yarn.lock",
+    "**/pnpm-lock.yaml",
+    "**/dist/**",
+    "**/build/**",
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/coverage/**",
+    "**/*.min.js",
+    "**/*.map"
+  ],
+  "comment": {
+    "enabled": true,
+    "template": "🔍 **Pull Request Size:** {size}",
+    "updateExisting": true
+  },
+  "label": {
+    "enabled": true,
+    "prefix": "size:"
+  },
+  "logging": {
+    "verbose": true
+  }
+} 
