@@ -1,7 +1,7 @@
 {
-  "name": "sizewise",
+  "name": "pr-sizewise",
   "version": "1.0.0",
-  "description": "A tool that analyzes the size and complexity of pull requests to help teams maintain manageable code changes. Works seamlessly with both GitHub and GitLab.",
+  "description": "A CLI tool that measures and reports pull request sizes for GitHub and GitLab, helping teams maintain manageable code changes.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
