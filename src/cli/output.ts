@@ -1,6 +1,9 @@
 import type { AnalysisResult, SizeThresholds } from '../types';
 import chalk from 'chalk';
 import { handleError } from '../utils/errors';
+import { createDefaultLogger } from '../utils/logger';
+
+const logger = createDefaultLogger();
 
 /**
  * Formats output for JSON display
@@ -32,41 +35,35 @@ export function displayConsoleOutput(
   const { size, details } = result;
 
   // Header
-  console.log('');
-  console.log(chalk.bold('📊 Pull Request Analysis'));
-  console.log(chalk.dim('─'.repeat(30)));
+  logger.header('📊 Pull Request Analysis');
 
   // Platform
-  console.log(chalk.gray(`Platform: ${platform.toUpperCase()}`));
+  logger.info(`Platform: ${platform.toUpperCase()}`);
 
   // Size classification
-  console.log('');
-  console.log('Size Classification:', size.toUpperCase());
+  logger.blank();
+  logger.info('Size Classification:', size.toUpperCase());
 
   // Metrics
-  console.log('');
-  console.log(chalk.bold('Metrics:'));
-  console.log(chalk.dim('─'.repeat(20)));
+  logger.subheader('Metrics');
 
   for (const detail of details) {
-    console.log(chalk.gray('•'), detail);
+    logger.dim('•', detail);
   }
 
   // Verbose output
   if (verbose) {
-    console.log('');
-    console.log(chalk.bold('Thresholds:'));
-    console.log(chalk.dim('─'.repeat(20)));
+    logger.subheader('Thresholds');
 
     for (const [category, threshold] of Object.entries(result.thresholds)) {
-      console.log(chalk.gray(`${category}:`));
-      console.log(chalk.gray('  Files:'), threshold.files);
-      console.log(chalk.gray('  Lines:'), threshold.lines);
-      console.log(chalk.gray('  Directories:'), threshold.directories);
+      logger.dim(`${category}:`);
+      logger.dim('  Files:', threshold.files);
+      logger.dim('  Lines:', threshold.lines);
+      logger.dim('  Directories:', threshold.directories);
     }
   }
 
-  console.log('');
+  logger.blank();
 }
 
 /**
@@ -74,12 +71,11 @@ export function displayConsoleOutput(
  */
 export function displayError(error: unknown, isJson: boolean, platform?: string): void {
   const { message, code } = handleError(error);
-
+  
   if (isJson) {
-    console.log(JSON.stringify(formatJsonOutput(null, false, platform, message), null, 2));
+    logger.json(formatJsonOutput(null, false, platform, message));
   } else {
-    console.error(chalk.red('❌ Error:'), chalk.dim(`[${code}]`));
-    console.error(chalk.red(message));
+    logger.logError('Error', error);
   }
 }
 
@@ -97,13 +93,13 @@ export function checkAndDisplaySizeWarning(
 
   if (result.size === largestThreshold) {
     const message = `This ${platform === 'github' ? 'pull' : 'merge'} request is ${result.size.toLowerCase()}! Consider breaking it down into smaller chunks.`;
-
+    
     if (isJson) {
-      console.log(JSON.stringify({ warning: message }, null, 2));
+      logger.json({ warning: message });
     } else {
-      console.log('');
-      console.log(chalk.yellow('⚠️  Warning:'), message);
-      console.log('');
+      logger.blank();
+      logger.warning(message);
+      logger.blank();
     }
     return true;
   }

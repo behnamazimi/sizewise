@@ -1,5 +1,4 @@
 import { Command } from 'commander';
-import chalk from 'chalk';
 import { UniversalSizeWiseAnalyzer } from '../analyzer';
 import { detectPlatform } from '../providers';
 import { createConfigFile, loadConfig } from './config';
@@ -8,6 +7,9 @@ import { displayConsoleOutput, displayError, formatJsonOutput, checkAndDisplaySi
 import { runConfigWizard } from './wizard';
 import type { CliOptions } from '../types';
 import { ValidationError, PlatformError } from '../utils/errors';
+import { createDefaultLogger } from '../utils/logger';
+
+const logger = createDefaultLogger();
 
 /**
  * Setup analyze command (default)
@@ -76,7 +78,7 @@ async function handleAnalyzeCommand(options: CliOptions): Promise<void> {
     const platform = detectedPlatform;
 
     if (!options.json) {
-      console.log(chalk.gray(`🔧 Detected platform: ${platform.toUpperCase()}`));
+      logger.info(`Detected platform: ${platform.toUpperCase()}`);
     }
 
     // Get and validate required values
@@ -107,7 +109,7 @@ async function handleAnalyzeCommand(options: CliOptions): Promise<void> {
 
     // Output results
     if (options.json) {
-      console.log(JSON.stringify(formatJsonOutput(result, true, platform), null, 2));
+      logger.json(formatJsonOutput(result, true, platform));
     } else {
       displayConsoleOutput(result, platform, options.verbose || false);
     }

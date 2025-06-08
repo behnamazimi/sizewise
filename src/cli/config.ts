@@ -1,8 +1,10 @@
 import path from 'path';
 import fs from 'fs';
-import chalk from 'chalk';
 import type { SizewiseConfig } from '../types';
+import { createDefaultLogger } from '../utils/logger';
 import { DEFAULT_CONFIG } from '../index';
+
+const logger = createDefaultLogger();
 
 /**
  * Creates a configuration file in the appropriate directory
@@ -19,8 +21,8 @@ export function createConfigFile(platform: 'github' | 'gitlab', force: boolean =
 
   // Check if config already exists and force is not set
   if (fs.existsSync(configPath) && !force) {
-    console.log(chalk.yellow(`⚠️  Configuration file already exists at ${configPath}`));
-    console.log(chalk.gray('   Use --force to overwrite'));
+    logger.warning(`Configuration file already exists at ${configPath}`);
+    logger.dim('Use --force to overwrite');
     return;
   }
 
@@ -47,7 +49,7 @@ export function createConfigFile(platform: 'github' | 'gitlab', force: boolean =
       configContent = JSON.stringify(configTemplate, null, 2);
     }
   } catch (error) {
-    console.error(chalk.red(`❌ Failed to read example configuration: ${error}`));
+    logger.logError('Failed to read example configuration', error);
     process.exit(1);
   }
 
@@ -55,13 +57,13 @@ export function createConfigFile(platform: 'github' | 'gitlab', force: boolean =
   try {
     fs.writeFileSync(configPath, configContent);
     if (force && fs.existsSync(configPath)) {
-      console.log(chalk.green(`✅ Successfully overwritten configuration file at ${configPath}`));
+      logger.success(`Successfully overwritten configuration file at ${configPath}`);
     } else {
-      console.log(chalk.green(`✅ Successfully created configuration file at ${configPath}`));
+      logger.success(`Successfully created configuration file at ${configPath}`);
     }
-    console.log(chalk.gray('   Edit this file to customize your size analysis thresholds and behavior.'));
+    logger.dim('Edit this file to customize your size analysis thresholds and behavior.');
   } catch (error) {
-    console.error(chalk.red(`❌ Failed to create configuration file: ${error}`));
+    logger.logError('Failed to create configuration file', error);
     process.exit(1);
   }
 }
@@ -105,8 +107,8 @@ export function loadConfig(configPath?: string): SizewiseConfig {
         },
       };
     } catch (error) {
-      console.warn(chalk.yellow(`⚠️  Failed to load config file: ${finalConfigPath}`));
-      console.warn(chalk.gray(`   Using default configuration. Error: ${error}`));
+      logger.warning(`Failed to load config file: ${finalConfigPath}`);
+      logger.dim(`Using default configuration. Error: ${error}`);
     }
   }
 

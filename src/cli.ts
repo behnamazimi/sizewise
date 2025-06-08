@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import chalk from 'chalk';
 import { setupAnalyzeCommand, setupInitCommand } from './cli/commands';
 import { handleError } from './utils/errors';
+import { createDefaultLogger } from './utils/logger';
 
+const logger = createDefaultLogger();
 const program = new Command();
 
 program
@@ -18,8 +19,7 @@ setupInitCommand(program);
 
 // Error handling for unknown commands
 program.on('command:*', () => {
-  console.error(chalk.red('❌ Invalid command'));
-  console.error(chalk.dim('See --help for a list of available commands.'));
+  logger.logError('Invalid command', new Error('See --help for a list of available commands.'));
   process.exit(1);
 });
 
@@ -29,9 +29,7 @@ async function main() {
 }
 
 main().catch(error => {
-  const { message, code } = handleError(error);
-  console.error(chalk.red('❌ Error:'), chalk.dim(`[${code}]`));
-  console.error(chalk.red(message));
+  logger.logError('Error', error);
   process.exit(1);
 });
 

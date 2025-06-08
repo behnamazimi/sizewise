@@ -3,7 +3,9 @@ import path from 'path';
 import fs from 'fs';
 import { DEFAULT_CONFIG } from '../index';
 import type { SizewiseConfig } from '../types';
-import { colors, symbols } from './style';
+import { createDefaultLogger } from '../utils/logger';
+
+const logger = createDefaultLogger();
 
 interface WizardAnswers {
   platform: 'github' | 'gitlab';
@@ -12,11 +14,10 @@ interface WizardAnswers {
 }
 
 export async function runConfigWizard(): Promise<void> {
-  console.log('');
-  console.log(colors.header('Welcome to SizeWise Configuration Wizard'));
-  console.log(colors.dim('─'.repeat(40)));
-  console.log(colors.dim('This wizard will help you create a customized configuration file for your project.'));
-  console.log('');
+  logger.blank();
+  logger.header('Welcome to SizeWise Configuration Wizard');
+  logger.dim('This wizard will help you create a customized configuration file for your project.');
+  logger.blank();
 
   try {
     const answers = await inquirer.prompt<WizardAnswers>([
@@ -73,21 +74,19 @@ export async function runConfigWizard(): Promise<void> {
     );
 
     // Success message
-    console.log('');
-    console.log(colors.header('Configuration Complete'));
-    console.log(colors.dim('─'.repeat(20)));
-    console.log(colors.success(`${symbols.success} Configuration file created successfully!`));
-    console.log(colors.info(`${symbols.info} Location: ${colors.link(configPath)}`));
-    console.log('');
-    console.log('You can now run SizeWise with your custom configuration:');
-    console.log(colors.command('npx sizewise'));
-    console.log('');
+    logger.blank();
+    logger.header('Configuration Complete');
+    logger.success('Configuration file created successfully!');
+    logger.info(`Location: ${configPath}`);
+    logger.blank();
+    logger.info('You can now run SizeWise with your custom configuration:');
+    logger.dim('npx sizewise');
+    logger.blank();
 
   } catch (error) {
-    console.log('');
-    console.log(colors.error(`${symbols.error} Error creating configuration:`));
-    console.log(colors.error(error instanceof Error ? error.message : String(error)));
-    console.log('');
+    logger.blank();
+    logger.logError('Error creating configuration', error);
+    logger.blank();
     process.exit(1);
   }
 }
