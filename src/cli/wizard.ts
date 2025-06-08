@@ -1,7 +1,7 @@
 import inquirer from 'inquirer';
 import path from 'path';
 import fs from 'fs';
-import { DEFAULT_CONFIG } from './config';
+import { DEFAULT_CONFIG } from '../index';
 import type { SizewiseConfig } from '../types';
 import { colors, symbols } from './style';
 

@@ -2,47 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import chalk from 'chalk';
 import type { SizewiseConfig } from '../types';
-
-/**
- * Default configuration values
- */
-export const DEFAULT_CONFIG: SizewiseConfig = {
-  thresholds: {
-    small: {
-      files: 5,
-      lines: 50,
-      directories: 2,
-    },
-    medium: {
-      files: 10,
-      lines: 200,
-      directories: 4,
-    },
-    large: {
-      files: 20,
-      lines: 500,
-      directories: 8,
-    },
-  },
-  excludePatterns: [
-    '**/*.lock',
-    '**/package-lock.json',
-    '**/yarn.lock',
-    '**/pnpm-lock.yaml',
-  ],
-  comment: {
-    enabled: false,
-    template: '🔍 **Pull Request Size:** {size}',
-    updateExisting: true,
-  },
-  label: {
-    enabled: false,
-    prefix: 'size:',
-  },
-  logging: {
-    verbose: true,
-  },
-};
+import { DEFAULT_CONFIG } from '../index';
 
 /**
  * Creates a configuration file in the appropriate directory
