@@ -8,12 +8,12 @@ import { PlatformError } from '../utils/errors';
  */
 export function createProvider(config: VCSProviderConfig): VCSProvider {
   switch (config.platform) {
-    case 'github':
-      return new GitHubProvider();
-    case 'gitlab':
-      return new GitLabProvider();
-    default:
-      throw new PlatformError(`Unsupported platform: ${config.platform}`);
+  case 'github':
+    return new GitHubProvider();
+  case 'gitlab':
+    return new GitLabProvider();
+  default:
+    throw new PlatformError(`Unsupported platform: ${config.platform}`);
   }
 }
 

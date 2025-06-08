@@ -1,16 +1,6 @@
 import chalk from 'chalk';
 import type { SizewiseConfig } from '../types';
-import { SizeWiseError, handleError } from './errors';
-
-/**
- * Logger levels
- */
-export enum LogLevel {
-  INFO = 'info',
-  WARN = 'warn',
-  ERROR = 'error',
-  DEBUG = 'debug',
-}
+import { handleError } from './errors';
 
 /**
  * Enhanced logger that respects the verbose configuration
@@ -53,7 +43,7 @@ export class Logger {
       chalk.red(context),
       chalk.dim(`[${code}]`),
       '\n',
-      chalk.red(message)
+      chalk.red(message),
     );
   }
 }

@@ -1,35 +1,6 @@
-import type { CliJsonOutput, AnalysisResult, SizeThresholds } from '../types';
-import { colors, symbols, formatMetric, formatList } from './style';
+import type { AnalysisResult, SizeThresholds } from '../types';
 import chalk from 'chalk';
 import { handleError } from '../utils/errors';
-
-const packageJson = require('../../package.json');
-
-/**
- * Get color and symbol for a size based on its position in the threshold list
- */
-function getSizeFormatting(size: string, thresholds: Record<string, any>): { color: (text: string) => string; symbol: string } {
-  const thresholdKeys = Object.keys(thresholds);
-  const position = thresholdKeys.indexOf(size.toLowerCase());
-
-  if (position === -1) {
-    return { color: colors.value, symbol: symbols.info };
-  }
-
-  const ratio = position / (thresholdKeys.length - 1); // 0 to 1
-
-  if (position === 0) {
-    return { color: colors.severity.lowest, symbol: symbols.success };
-  } else if (ratio <= 0.25) {
-    return { color: colors.severity.low, symbol: symbols.success };
-  } else if (ratio <= 0.5) {
-    return { color: colors.severity.medium, symbol: symbols.info };
-  } else if (ratio <= 0.75) {
-    return { color: colors.severity.high, symbol: symbols.warning };
-  } else {
-    return { color: colors.severity.highest, symbol: symbols.error };
-  }
-}
 
 /**
  * Formats output for JSON display
@@ -58,7 +29,7 @@ export function displayConsoleOutput(
   platform: string,
   verbose: boolean,
 ): void {
-  const { metrics, size, details } = result;
+  const { size, details } = result;
 
   // Header
   console.log('');
@@ -70,7 +41,7 @@ export function displayConsoleOutput(
 
   // Size classification
   console.log('');
-  console.log('Size Classification:', getSizeColor(size)(size.toUpperCase()));
+  console.log('Size Classification:', size.toUpperCase());
 
   // Metrics
   console.log('');
@@ -103,7 +74,7 @@ export function displayConsoleOutput(
  */
 export function displayError(error: unknown, isJson: boolean, platform?: string): void {
   const { message, code } = handleError(error);
-  
+
   if (isJson) {
     console.log(JSON.stringify(formatJsonOutput(null, false, platform, message), null, 2));
   } else {
@@ -126,7 +97,7 @@ export function checkAndDisplaySizeWarning(
 
   if (result.size === largestThreshold) {
     const message = `This ${platform === 'github' ? 'pull' : 'merge'} request is ${result.size.toLowerCase()}! Consider breaking it down into smaller chunks.`;
-    
+
     if (isJson) {
       console.log(JSON.stringify({ warning: message }, null, 2));
     } else {
@@ -138,20 +109,4 @@ export function checkAndDisplaySizeWarning(
   }
 
   return false;
-}
-
-/**
- * Get chalk color function based on size
- */
-function getSizeColor(size: string): (text: string) => string {
-  switch (size.toLowerCase()) {
-    case 'small':
-      return chalk.green;
-    case 'medium':
-      return chalk.yellow;
-    case 'large':
-      return chalk.red;
-    default:
-      return chalk.white;
-  }
 }

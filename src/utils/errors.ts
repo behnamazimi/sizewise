@@ -76,16 +76,3 @@ export function handleError(error: unknown): { message: string; code: string } {
     code: 'UNKNOWN_ERROR',
   };
 }
-
-/**
- * Utility to ensure an error is a SizeWiseError
- */
-export function ensureSizeWiseError(error: unknown): SizeWiseError {
-  if (error instanceof SizeWiseError) {
-    return error;
-  }
-  return new SizeWiseError(
-    error instanceof Error ? error.message : String(error),
-    'UNKNOWN_ERROR'
-  );
-} 
