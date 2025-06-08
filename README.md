@@ -1,31 +1,46 @@
 # 🚦 SizeWise
 
-A CLI tool that helps you measure and report the size of pull requests or merge requests.
+SizeWise is a CLI tool that measures and reports the size of your pull requests (or merge requests on Gitlab).
 
-SizeWise analyzes your PRs or MRs and gives quick feedback on their size. Giving you clear metrics so your team can stay aware.
+It quickly analyzes your PRs and gives you clear, simple feedback, so your team can easily see how big the changes are and stay on the same page.
+
+SizeWise uses [@octokit/rest](https://www.npmjs.com/package/@octokit/rest) Github and [@gitbeaker/rest](https://www.npmjs.com/package/@gitbeaker/rest) Gitlab REST API clients to fetch data.
 
 ---
 
 ## ⚡ Quick Start
 
+1. **Initialize Configuration**
 ```bash
-# 1. Set up configuration
 npx sizewise init
 ```
-The wizard walks you through size thresholds and preferences. After that, just run npx sizewise on any PR.
+This will create a config file with your preferred settings through an interactive wizard.
 
+2. **Analyze Your PR/MR**
 
+With environment variables:
 ```bash
-# 2. Run analysis
-npx sizewise
+# If you have GITHUB_TOKEN/GITLAB_TOKEN and other env vars set
+npx sizewise --pr-id 123
+```
+
+Without environment variables:
+```bash
+# Provide all required arguments manually
+npx sizewise \
+  --platform github \
+  --host https://github.company.com \
+  --token $GITHUB_TOKEN \
+  --project-id myorg/myrepo \
+  --pr-id 456
 ```
 
 ---
 
-## 🔑 Features
+## Features
 
 - Supports **GitHub** & **GitLab**
-- Tracks files, lines, and directories changed
+- **File changes**, **line changes**, and **impacted directories** analysis
 - Custom **size thresholds**
 - Fully **CI/CD friendly**
 - Adds **labels** and **comments** automatically
@@ -48,38 +63,52 @@ npx sizewise \
   --project-id myorg/myrepo
 ```
 
-## Environment Variables:
+## Required Configuration
 
-SizeWise automatically looks for default environment variables to detect the platform (GitHub or GitLab).
+You can configure SizeWise either through environment variables or CLI options. You need to provide:
+1. Platform information (GitHub/GitLab)
+2. Authentication
+3. Project identification
+4. Pull/Merge request ID
 
-**For GitLab:**
-- `GITLAB_TOKEN` or `CI_JOB_TOKEN` - for access
-- `GITLAB_HOST` or `CI_SERVER_URL` - GitLab URL
-- `CI_PROJECT_ID` - project ID
-- `CI_MERGE_REQUEST_IID` - merge request ID
+### Environment Variables
 
-**For GitHub:**
-- `GITHUB_TOKEN` - for access
-- `GITHUB_SERVER_URL` - GitHub URL
-- `GITHUB_REPOSITORY` - in `owner/repo` format
-- `GITHUB_EVENT_NUMBER` or `PR_NUMBER` - pull request number
+**GitHub:**
+```bash
+# Required for GitHub
+GITHUB_TOKEN=your_token                # Authentication, with proper permissions
+GITHUB_SERVER_URL=https://github.com   # Your GitHub URL
+GITHUB_REPOSITORY=owner/repo           # Repository in owner/repo format
+GITHUB_EVENT_NUMBER=123                # PR number (or use --pr-id)
+```
 
+**GitLab:**
+```bash
+# Required for GitLab
+GITLAB_TOKEN=your_token                # Authentication (or CI_JOB_TOKEN), with proper permissions
+GITLAB_HOST=https://gitlab.com         # Your GitLab URL (or CI_SERVER_URL)
+CI_PROJECT_ID=123                      # Project ID
+CI_MERGE_REQUEST_IID=456               # MR ID (or use --pr-id)
+```
 
-## ⚙️ Common CLI Options
+### ⚙️ CLI Options
 
-You can also use CLI arguments to configure the analysis. These arguments will override the default environment variables.
+**Required (if not using env vars):**
+| Option               | Description                                    | Default               |
+|---------------------|------------------------------------------------|----------------------|
+| `--pr-id`, `--mr-id` | Pull/Merge request ID to analyze               | From env vars        |
+| `--platform`         | Platform to use (`github`, `gitlab`)           | Auto-detected        |
+| `--token`            | API token for authentication                   | From env vars        |
+| `--host`             | Platform URL (e.g. https://github.com)         | From env vars        |
+| `--project-id`       | GitHub: `owner/repo` • GitLab: numeric ID     | From env vars        |
 
-| Option               | Description                                    |
-|----------------------|------------------------------------------------|
-| `--pr-id`, `--mr-id` | Pull/Merge request ID                          |
-| `--project-id`       | GitHub: `owner/repo` • GitLab: numeric ID     |
-| `--token`            | API token (overrides env vars)                |
-| `--host`             | Custom platform URL                           |
-| `--platform`         | Force platform (`github`, `gitlab`)           |
-| `-c`, `--config`     | Custom config file path                       |
-| `-v`, `--verbose`    | Show detailed output                          |
-| `-j`, `--json`       | Output in JSON format                         |
-| `--no-exit-code`     | Don't fail CI on large PRs                    |
+**Optional:**
+| Option              | Description                                    | Default               |
+|---------------------|------------------------------------------------|----------------------|
+| `-c`, `--config`    | Custom config file path                        | Auto-detected        |
+| `-v`, `--verbose`   | Show detailed output                           | `false`              |
+| `-j`, `--json`      | Output in JSON format                          | `false`              |
+| `--no-exit-code`    | Don't fail CI on large PRs                     | `false`              |
 
 ---
 
