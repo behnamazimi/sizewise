@@ -6,6 +6,7 @@ import type {
   Comment,
   PullRequestInfo,
 } from './base';
+import { ValidationError, APIError } from '../utils/errors';
 
 /**
  * GitHub provider implementation
@@ -24,39 +25,46 @@ export class GitHubProvider implements VCSProvider {
     // Parse owner/repo from projectId (format: "owner/repo")
     const [owner, repo] = config.projectId.split('/');
     if (!owner || !repo) {
-      throw new Error('GitHub projectId must be in format "owner/repo"');
+      throw new ValidationError('GitHub projectId must be in format "owner/repo"');
     }
     this.owner = owner;
     this.repo = repo;
   }
 
   async getDiffs(pullRequestId: string): Promise<DiffInfo[]> {
-    const prNumber = parseInt(pullRequestId, 10);
+    try {
+      const prNumber = parseInt(pullRequestId, 10);
 
-    // Get the list of files in the PR
-    const { data: files } = await this.octokit.pulls.listFiles({
-      owner: this.owner,
-      repo: this.repo,
-      pull_number: prNumber,
-    });
-
-    const diffs: DiffInfo[] = [];
-
-    for (const file of files) {
-      // For each file, get the actual diff content
-      const diff = file.patch ?? '';
-
-      diffs.push({
-        oldPath: file.previous_filename ?? file.filename,
-        newPath: file.filename,
-        diff,
-        isNewFile: file.status === 'added',
-        isDeletedFile: file.status === 'removed',
-        isRenamedFile: file.status === 'renamed',
+      // Get the list of files in the PR
+      const { data: files } = await this.octokit.pulls.listFiles({
+        owner: this.owner,
+        repo: this.repo,
+        pull_number: prNumber,
       });
-    }
 
-    return diffs;
+      const diffs: DiffInfo[] = [];
+
+      for (const file of files) {
+        // For each file, get the actual diff content
+        const diff = file.patch ?? '';
+
+        diffs.push({
+          oldPath: file.previous_filename ?? file.filename,
+          newPath: file.filename,
+          diff,
+          isNewFile: file.status === 'added',
+          isDeletedFile: file.status === 'removed',
+          isRenamedFile: file.status === 'renamed',
+        });
+      }
+
+      return diffs;
+    } catch (error) {
+      if (error instanceof Error && 'status' in error) {
+        throw new APIError(`Failed to get PR diffs: ${error.message}`, (error as any).status);
+      }
+      throw new APIError(`Failed to get PR diffs: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 
   async getComments(pullRequestId: string): Promise<Comment[]> {

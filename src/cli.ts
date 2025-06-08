@@ -3,33 +3,36 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { setupAnalyzeCommand, setupInitCommand } from './cli/commands';
+import { handleError } from './utils/errors';
 
-const packageJson = require('../package.json');
+const program = new Command();
 
-/**
- * Main CLI function
- */
-async function main(): Promise<void> {
-  const program = new Command();
+program
+  .name('sizewise')
+  .description('A platform-agnostic pull/merge request size analyzer')
+  .version(process.env.npm_package_version || '1.0.0');
 
-  program
-    .name('sizewise')
-    .description('Analyze pull/merge request size and complexity across GitLab and GitHub')
-    .version(packageJson.version);
+// Setup commands
+setupAnalyzeCommand(program);
+setupInitCommand(program);
 
-  // Setup commands
-  setupAnalyzeCommand(program);
-  setupInitCommand(program);
+// Error handling for unknown commands
+program.on('command:*', () => {
+  console.error(chalk.red('❌ Invalid command'));
+  console.error(chalk.dim('See --help for a list of available commands.'));
+  process.exit(1);
+});
 
-  program.parse(process.argv);
+// Main execution
+async function main() {
+  await program.parseAsync(process.argv);
 }
 
-// Run CLI
-if (require.main === module) {
-  main().catch(error => {
-    console.error(chalk.red('❌ Error:'), error);
-    process.exit(1);
-  });
-}
+main().catch(error => {
+  const { message, code } = handleError(error);
+  console.error(chalk.red('❌ Error:'), chalk.dim(`[${code}]`));
+  console.error(chalk.red(message));
+  process.exit(1);
+});
 
 export { main as runUniversalCli };

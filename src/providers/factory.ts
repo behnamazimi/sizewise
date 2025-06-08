@@ -1,18 +1,19 @@
 import type { VCSProvider, VCSProviderConfig } from './base';
-import { GitLabProvider } from './gitlab';
 import { GitHubProvider } from './github';
+import { GitLabProvider } from './gitlab';
+import { PlatformError } from '../utils/errors';
 
 /**
- * Factory function to create the appropriate VCS provider
+ * Creates a VCS provider instance based on configuration
  */
 export function createProvider(config: VCSProviderConfig): VCSProvider {
   switch (config.platform) {
-  case 'gitlab':
-    return new GitLabProvider();
-  case 'github':
-    return new GitHubProvider();
-  default:
-    throw new Error(`Unsupported platform: ${config.platform}`);
+    case 'github':
+      return new GitHubProvider();
+    case 'gitlab':
+      return new GitLabProvider();
+    default:
+      throw new PlatformError(`Unsupported platform: ${config.platform}`);
   }
 }
 

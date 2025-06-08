@@ -7,6 +7,7 @@ import { getRequiredValues, validateRequiredValues } from './env';
 import { displayConsoleOutput, displayError, formatJsonOutput, checkAndDisplaySizeWarning } from './output';
 import { runConfigWizard } from './wizard';
 import type { CliOptions } from '../types';
+import { ValidationError, PlatformError } from '../utils/errors';
 
 /**
  * Setup analyze command (default)
@@ -39,15 +40,13 @@ export function setupInitCommand(program: Command): void {
     .action(async (options: { platform?: string; force?: boolean; wizard?: boolean }) => {
       try {
         if (options.platform && !['github', 'gitlab'].includes(options.platform)) {
-          console.error(chalk.red('❌ Platform must be either "github" or "gitlab"'));
-          process.exit(1);
+          throw new ValidationError('Platform must be either "github" or "gitlab"');
         }
 
         if (options.wizard === false) {
           // Use old behavior with platform
           if (!options.platform) {
-            console.error(chalk.red('❌ Platform is required when not using wizard'));
-            process.exit(1);
+            throw new ValidationError('Platform is required when not using wizard');
           }
           createConfigFile(options.platform as 'github' | 'gitlab', options.force || false);
         } else {
@@ -56,7 +55,7 @@ export function setupInitCommand(program: Command): void {
         }
         process.exit(0);
       } catch (error) {
-        console.error(chalk.red('❌ Error:'), error);
+        displayError(error, false);
         process.exit(1);
       }
     });
@@ -71,9 +70,7 @@ async function handleAnalyzeCommand(options: CliOptions): Promise<void> {
     const detectedPlatform = options.platform || detectPlatform();
 
     if (!detectedPlatform) {
-      const errorMsg = 'Could not auto-detect platform. Please specify --platform (gitlab, github) or ensure you\'re running in a supported CI environment.';
-      displayError(errorMsg, options.json || false);
-      process.exit(1);
+      throw new PlatformError('Could not auto-detect platform. Please specify --platform (gitlab, github) or ensure you\'re running in a supported CI environment.');
     }
 
     const platform = detectedPlatform;
@@ -88,15 +85,11 @@ async function handleAnalyzeCommand(options: CliOptions): Promise<void> {
 
     // Check for either PR ID or MR ID
     if (!values.prId) {
-      const errorMsg = 'Pull/Merge request ID is required. Please provide a valid PR/MR ID using --pr-id or --mr-id.';
-      displayError(errorMsg, options.json || false);
-      return;
+      throw new ValidationError('Pull/Merge request ID is required. Please provide a valid PR/MR ID using --pr-id or --mr-id.');
     }
 
     if (errors.length > 0) {
-      const errorMsg = `Missing required values: ${errors.join(', ')}`;
-      displayError(errorMsg, options.json || false, platform);
-      process.exit(1);
+      throw new ValidationError(`Missing required values: ${errors.join(', ')}`);
     }
 
     // Load configuration
@@ -124,8 +117,7 @@ async function handleAnalyzeCommand(options: CliOptions): Promise<void> {
       process.exit(1);
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    displayError(errorMessage, options.json || false);
+    displayError(error, options.json || false);
     process.exit(1);
   }
 }

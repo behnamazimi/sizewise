@@ -7,6 +7,7 @@ import type {
 import { createProvider, detectPlatform, type VCSProvider, type VCSProviderConfig } from './providers';
 import { parseDiff, globToRegex } from './utils/diff-parser';
 import { createLogger, Logger } from './utils/logger';
+import { PlatformError, AuthError, ValidationError } from './utils/errors';
 
 /**
  * Platform-agnostic analyzer class that processes pull/merge requests and determines their size.
@@ -39,7 +40,7 @@ export class UniversalSizeWiseAnalyzer {
     const platform = overrides.platform || detectPlatform();
 
     if (!platform) {
-      throw new Error('Could not auto-detect platform. Please specify platform explicitly.');
+      throw new PlatformError('Could not auto-detect platform. Please specify platform explicitly.');
     }
 
     const providerConfig: VCSProviderConfig = {
@@ -51,13 +52,13 @@ export class UniversalSizeWiseAnalyzer {
     };
 
     if (!providerConfig.token) {
-      throw new Error(`${platform.toUpperCase()}_TOKEN environment variable is required`);
+      throw new AuthError(`${platform.toUpperCase()}_TOKEN environment variable is required`);
     }
     if (!providerConfig.host) {
-      throw new Error(`${platform.toUpperCase()}_HOST environment variable is required`);
+      throw new ValidationError(`${platform.toUpperCase()}_HOST environment variable is required`);
     }
     if (!providerConfig.projectId) {
-      throw new Error('Project ID is required');
+      throw new ValidationError('Project ID is required');
     }
 
     const analyzer = new UniversalSizeWiseAnalyzer(config, providerConfig);
@@ -141,8 +142,7 @@ export class UniversalSizeWiseAnalyzer {
 
       return metrics;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      throw new Error(`Error getting pull request changes: ${errorMessage}`);
+      throw new PlatformError(`Error getting pull request changes: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -253,7 +253,7 @@ export class UniversalSizeWiseAnalyzer {
         this.logger.info(`✅ Created new comment with size: ${size}`);
       }
     } catch (error) {
-      this.logger.logError('❌ Failed to handle PR/MR comment:', error);
+      this.logger.logError('Failed to handle PR/MR comment', error);
     }
   }
 
@@ -316,7 +316,7 @@ export class UniversalSizeWiseAnalyzer {
         this.logger.info(`✅ Added label "${newSizeLabel}"`);
       }
     } catch (error) {
-      this.logger.logError('❌ Failed to update PR/MR labels:', error);
+      this.logger.logError('Failed to update PR/MR labels', error);
     }
   }
 
