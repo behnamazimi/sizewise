@@ -37,7 +37,7 @@ export class UniversalSizeWiseAnalyzer {
     config: SizewiseConfig,
     overrides: Partial<VCSProviderConfig> = {},
   ): Promise<UniversalSizeWiseAnalyzer> {
-    const platform = overrides.platform || detectPlatform();
+    const platform = overrides.platform ?? detectPlatform();
 
     if (!platform) {
       throw new PlatformError('Could not auto-detect platform. Please specify platform explicitly.');
@@ -45,9 +45,9 @@ export class UniversalSizeWiseAnalyzer {
 
     const providerConfig: VCSProviderConfig = {
       platform,
-      token: overrides.token || process.env.GITLAB_TOKEN || process.env.GITHUB_TOKEN || '',
-      host: overrides.host || process.env.GITLAB_HOST || process.env.GITHUB_SERVER_URL || '',
-      projectId: overrides.projectId || process.env.CI_PROJECT_ID || process.env.GITHUB_REPOSITORY || '',
+      token: overrides.token ?? process.env.GITLAB_TOKEN ?? process.env.GITHUB_TOKEN ?? '',
+      host: overrides.host ?? process.env.GITLAB_HOST ?? process.env.GITHUB_SERVER_URL ?? '',
+      projectId: overrides.projectId ?? process.env.CI_PROJECT_ID ?? process.env.GITHUB_REPOSITORY ?? '',
       ...overrides,
     };
 
@@ -209,7 +209,7 @@ export class UniversalSizeWiseAnalyzer {
 
       // Always include the marker, regardless of custom template (for tracking)
       const userTemplate =
-        this.config.comment.template || '🔍 **Pull Request Size:** {size}';
+        this.config.comment.template ?? '🔍 **Pull Request Size:** {size}';
       const commentBody = `${COMMENT_MARKER}\n${userTemplate.replace(/\{size\}/g, size)}`;
 
       this.logger.info(`📝 Update existing: ${updateExisting}`);
@@ -274,7 +274,7 @@ export class UniversalSizeWiseAnalyzer {
         `🏷️ Current labels: [${currentLabels.length > 0 ? currentLabels.join(', ') : 'none'}]`,
       );
 
-      const labelPrefix = this.config.label.prefix || 'size:';
+      const labelPrefix = this.config.label.prefix ?? 'size:';
       const newSizeLabel = `${labelPrefix}${size}`;
 
       // Check if correct label already exists

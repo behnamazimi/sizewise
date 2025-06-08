@@ -95,12 +95,12 @@ export interface PullRequestInfo {
  */
 export function detectPlatform(): 'gitlab' | 'github' | null {
   // GitLab CI
-  if (process.env.GITLAB_CI || process.env.CI_SERVER_URL) {
+  if (process.env.GITLAB_CI ?? process.env.CI_SERVER_URL) {
     return 'gitlab';
   }
 
   // GitHub Actions
-  if (process.env.GITHUB_ACTIONS || process.env.GITHUB_SERVER_URL) {
+  if (process.env.GITHUB_ACTIONS ?? process.env.GITHUB_SERVER_URL) {
     return 'github';
   }
 

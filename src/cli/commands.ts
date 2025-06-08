@@ -50,7 +50,7 @@ export function setupInitCommand(program: Command): void {
           if (!options.platform) {
             throw new ValidationError('Platform is required when not using wizard');
           }
-          createConfigFile(options.platform as 'github' | 'gitlab', options.force || false);
+          createConfigFile(options.platform as 'github' | 'gitlab', options.force ?? false);
         } else {
           // Run interactive wizard
           await runConfigWizard();
@@ -69,7 +69,7 @@ export function setupInitCommand(program: Command): void {
 async function handleAnalyzeCommand(options: CliOptions): Promise<void> {
   try {
     // Auto-detect platform if not specified
-    const detectedPlatform = options.platform || detectPlatform();
+    const detectedPlatform = options.platform ?? detectPlatform();
 
     if (!detectedPlatform) {
       throw new PlatformError('Could not auto-detect platform. Please specify --platform (gitlab, github) or ensure you\'re running in a supported CI environment.');
@@ -111,15 +111,15 @@ async function handleAnalyzeCommand(options: CliOptions): Promise<void> {
     if (options.json) {
       logger.json(formatJsonOutput(result, true, platform));
     } else {
-      displayConsoleOutput(result, platform, options.verbose || false);
+      displayConsoleOutput(result, platform, options.verbose ?? false);
     }
 
     // Check size warning and exit code
-    if (options.exitCode !== false && checkAndDisplaySizeWarning(result, config.thresholds, platform, options.json || false)) {
+    if (options.exitCode !== false && checkAndDisplaySizeWarning(result, config.thresholds, platform, options.json ?? false)) {
       process.exit(1);
     }
   } catch (error) {
-    displayError(error, options.json || false);
+    displayError(error, options.json ?? false);
     process.exit(1);
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "sizewise",
   "version": "1.0.0",
-  "description": "A platform-agnostic pull/merge request size analyzer that works with GitLab and GitHub",
+  "description": "A tool that analyzes the size and complexity of pull requests to help teams maintain manageable code changes. Works seamlessly with both GitHub and GitLab.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -67,6 +67,7 @@
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.56.0",
+    "globals": "^16.2.0",
     "inquirer": "^8.2.6",
     "prettier": "^3.3.0",
     "ts-node": "^10.9.0",

@@ -78,12 +78,12 @@ export function loadConfig(configPath?: string): SizewiseConfig {
   const gitlabConfigPath = path.resolve(process.cwd(), '.gitlab/sizewise.config.json');
   const githubConfigPath = path.resolve(process.cwd(), '.github/sizewise.config.json');
 
-  const finalConfigPath = configPath ||
+  const finalConfigPath = configPath ??
     (fs.existsSync(defaultConfigPath) ? defaultConfigPath :
       (fs.existsSync(gitlabConfigPath) ? gitlabConfigPath :
-        (fs.existsSync(githubConfigPath) ? githubConfigPath : null)));
+        (fs.existsSync(githubConfigPath) ? githubConfigPath : undefined)));
 
-  if (finalConfigPath) {
+  if (finalConfigPath !== undefined) {
     try {
       const userConfig = JSON.parse(fs.readFileSync(finalConfigPath, 'utf8'));
       config = {

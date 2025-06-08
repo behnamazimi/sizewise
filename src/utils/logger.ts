@@ -6,9 +6,9 @@ import { handleError } from './errors';
  * Enhanced logger that respects the verbose configuration
  */
 export class Logger {
-  private log: (...args: any[]) => void;
-  private error: (...args: any[]) => void;
-  private warn: (...args: any[]) => void;
+  private log: (...args: unknown[]) => void;
+  private error: (...args: unknown[]) => void;
+  private warn: (...args: unknown[]) => void;
 
   constructor(config: SizewiseConfig) {
     const isVerbose = config.logging?.verbose ?? true;
@@ -22,21 +22,21 @@ export class Logger {
   /**
    * Log info messages (respects verbose setting)
    */
-  info(...args: any[]): void {
+  info(...args: unknown[]): void {
     this.log(...args);
   }
 
   /**
    * Log success messages (respects verbose setting)
    */
-  success(...args: any[]): void {
+  success(...args: unknown[]): void {
     this.log(chalk.green('✅'), ...args);
   }
 
   /**
    * Log warning messages (always shown)
    */
-  warning(...args: any[]): void {
+  warning(...args: unknown[]): void {
     this.warn(chalk.yellow('⚠'), ...args);
   }
 
@@ -89,7 +89,7 @@ export class Logger {
   /**
    * Log a dimmed message
    */
-  dim(...args: any[]): void {
+  dim(...args: unknown[]): void {
     this.log(chalk.dim(...args));
   }
 }

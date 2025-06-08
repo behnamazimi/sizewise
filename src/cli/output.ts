@@ -1,5 +1,4 @@
 import type { AnalysisResult, SizeThresholds } from '../types';
-import chalk from 'chalk';
 import { handleError } from '../utils/errors';
 import { createDefaultLogger } from '../utils/logger';
 
@@ -20,7 +19,7 @@ export function formatJsonOutput(
     error,
     platform,
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0',
+    version: process.env.npm_package_version ?? '1.0.0',
   };
 }
 
@@ -70,8 +69,8 @@ export function displayConsoleOutput(
  * Display error message in appropriate format
  */
 export function displayError(error: unknown, isJson: boolean, platform?: string): void {
-  const { message, code } = handleError(error);
-  
+  const { message } = handleError(error);
+
   if (isJson) {
     logger.json(formatJsonOutput(null, false, platform, message));
   } else {
@@ -93,7 +92,7 @@ export function checkAndDisplaySizeWarning(
 
   if (result.size === largestThreshold) {
     const message = `This ${platform === 'github' ? 'pull' : 'merge'} request is ${result.size.toLowerCase()}! Consider breaking it down into smaller chunks.`;
-    
+
     if (isJson) {
       logger.json({ warning: message });
     } else {

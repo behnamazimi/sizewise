@@ -21,12 +21,12 @@ export function getRequiredValues(options: CliOptions, platform: 'github' | 'git
   const mapping = ENV_MAPPINGS[platform];
 
   // Get PR/MR ID from options or environment
-  const prId = options.prId || options.mrId || getEnvValue(mapping.pullRequestId);
+  const prId = options.prId ?? options.mrId ?? getEnvValue(mapping.pullRequestId);
 
   // Get other required values
-  const projectId = options.projectId || getEnvValue(mapping.projectId);
-  const token = options.token || getEnvValue(mapping.token);
-  const host = options.host || getEnvValue(mapping.host);
+  const projectId = options.projectId ?? getEnvValue(mapping.projectId);
+  const token = options.token ?? getEnvValue(mapping.token);
+  const host = options.host ?? getEnvValue(mapping.host);
 
   return {
     prId,

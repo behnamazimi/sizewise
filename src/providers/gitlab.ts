@@ -126,9 +126,20 @@ export class GitLabProvider implements VCSProvider {
     const mr = await this.gitlab.MergeRequests.show(this.projectId, mrId) as GitLabMR;
 
     return Array.isArray(mr.labels)
-      ? mr.labels.map((label: any) =>
-        typeof label === 'string' ? label : label.name ?? label.title ?? String(label),
-      )
+      ? mr.labels.map((label: unknown) => {
+        if (typeof label === 'string') {
+          return label;
+        }
+        if (typeof label === 'object' && label !== null) {
+          if ('name' in label && typeof label.name === 'string') {
+            return label.name;
+          }
+          if ('title' in label && typeof label.title === 'string') {
+            return label.title;
+          }
+        }
+        return String(label);
+      })
       : [];
   }
 
